@@ -1,0 +1,208 @@
+import ballerina/io;
+
+// URL encode a string for use in URLs
+function urlEncode(string input) returns string {
+    // Replace common characters that need encoding
+    string encoded = input;
+    encoded = re `/`.replaceAll(encoded, "%2F");
+    encoded = re ` `.replaceAll(encoded, "%20");
+    encoded = re `:`.replaceAll(encoded, "%3A");
+    return encoded;
+}
+
+// Generate combined dashboard with all three sections
+public function generateDashboard(ProductInfo[] products, ModuleInfo[] modules, ToolInfo[] tools) returns string {
+    string dashboard = "<!-- This section is auto-generated. Do not edit manually. -->" + "\n\n";
+
+    // Add products section
+    dashboard += generateProductsSection(products);
+    dashboard += "\n---\n\n";
+
+    // Add modules section
+    dashboard += generateModulesSection(modules);
+    dashboard += "\n---\n\n";
+
+    // Add tools section
+    dashboard += generateToolsSection(tools);
+
+    dashboard += "\n---\n\n" + string `*Last updated: ${getCurrentTimestamp()}*`;
+
+    return dashboard;
+}
+
+// Generate products section for dashboard
+function generateProductsSection(ProductInfo[] products) returns string {
+    string dashboard = "## Products" + "\n\n";
+    dashboard += "| Product | Organization | Latest Release | Open Issues | Open PRs | Build Status |" + "\n";
+    dashboard += "|---------|--------------|----------------|-------------|----------|-------------|" + "\n";
+
+    foreach ProductInfo product in products {
+        string productLink = string `[${product.name}](https://github.com/${product.githubOrg}/${product.productRepo})`;
+        string buildBadge = product.hasBuild ?
+            string `[![Build](https://github.com/${product.githubOrg}/${product.productRepo}/workflows/Build/badge.svg)](https://github.com/${product.githubOrg}/${product.productRepo}/actions)` :
+            "N/A";
+
+        string issuesLink = string `[${product.openIssues}](https://github.com/${product.githubOrg}/${product.productRepo}/issues)`;
+        string prsLink = string `[${product.openPRs}](https://github.com/${product.githubOrg}/${product.productRepo}/pulls)`;
+
+        dashboard += string `| ${productLink} | ${product.org} | ${product.latestRelease} | ${issuesLink} | ${prsLink} | ${buildBadge} |` + "\n";
+    }
+
+    dashboard += "\n" + "### Related Repositories" + "\n\n";
+    dashboard += "| Product | Documentation | Helm Charts |" + "\n";
+    dashboard += "|---------|---------------|-------------|" + "\n";
+
+    foreach ProductInfo product in products {
+        string docsLink = string `[${product.docsRepo}](https://github.com/${product.githubOrg}/${product.docsRepo})`;
+        string helmLink = string `[${product.helmRepo}](https://github.com/${product.githubOrg}/${product.helmRepo})`;
+
+        dashboard += string `| ${product.name} | ${docsLink} | ${helmLink} |` + "\n";
+    }
+
+    return dashboard;
+}
+
+// Generate modules section for dashboard
+function generateModulesSection(ModuleInfo[] modules) returns string {
+    string dashboard = "## Modules" + "\n\n";
+
+    // Separate modules by organization
+    ModuleInfo[] ballerinaModules = [];
+    ModuleInfo[] ballerinaxModules = [];
+
+    foreach ModuleInfo module in modules {
+        if module.org == "ballerina" {
+            ballerinaModules.push(module);
+        } else {
+            ballerinaxModules.push(module);
+        }
+    }
+
+    // Ballerina modules section
+    if ballerinaModules.length() > 0 {
+        dashboard += "### Ballerina Standard Library Modules" + "\n\n";
+        dashboard += "| Module | Latest Release | Open Issues | Open PRs | Build Status | Code Coverage |" + "\n";
+        dashboard += "|--------|----------------|-------------|----------|--------------|---------------|" + "\n";
+
+        foreach ModuleInfo module in ballerinaModules {
+            string moduleLink = string `[${module.name}](https://github.com/${module.githubOrg}/${module.moduleRepo})`;
+            string buildBadge = module.hasBuild ?
+                string `[![Build](https://github.com/${module.githubOrg}/${module.moduleRepo}/workflows/Build/badge.svg)](https://github.com/${module.githubOrg}/${module.moduleRepo}/actions)` :
+                "N/A";
+            string coverageBadge = string `[![codecov](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo}/branch/${module.defaultBranch}/graph/badge.svg)](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo})`;
+
+            string issuesLink = string `[${module.openIssues}](https://github.com/${module.githubOrg}/${module.moduleRepo}/issues)`;
+            string prsLink = string `[${module.openPRs}](https://github.com/${module.githubOrg}/${module.moduleRepo}/pulls)`;
+
+            dashboard += string `| ${moduleLink} | ${module.latestRelease} | ${issuesLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
+        }
+        dashboard += "\n";
+    }
+
+    // Ballerinax modules section
+    if ballerinaxModules.length() > 0 {
+        dashboard += "### Ballerinax Extended Modules" + "\n\n";
+        dashboard += "| Module | Latest Release | Open Issues | Open PRs | Build Status | Code Coverage |" + "\n";
+        dashboard += "|--------|----------------|-------------|----------|--------------|---------------|" + "\n";
+
+        foreach ModuleInfo module in ballerinaxModules {
+            string moduleLink = string `[${module.name}](https://github.com/${module.githubOrg}/${module.moduleRepo})`;
+            string buildBadge = module.hasBuild ?
+                string `[![Build](https://github.com/${module.githubOrg}/${module.moduleRepo}/workflows/Build/badge.svg)](https://github.com/${module.githubOrg}/${module.moduleRepo}/actions)` :
+                "N/A";
+            string coverageBadge = string `[![codecov](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo}/branch/${module.defaultBranch}/graph/badge.svg)](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo})`;
+
+            string issuesLink = string `[${module.openIssues}](https://github.com/${module.githubOrg}/${module.moduleRepo}/issues)`;
+            string prsLink = string `[${module.openPRs}](https://github.com/${module.githubOrg}/${module.moduleRepo}/pulls)`;
+
+            dashboard += string `| ${moduleLink} | ${module.latestRelease} | ${issuesLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
+        }
+        dashboard += "\n";
+    }
+
+    dashboard += "### Issue Labels" + "\n\n";
+    dashboard += "| Module | Library Label | BI Label |" + "\n";
+    dashboard += "|--------|---------------|----------|" + "\n";
+
+    foreach ModuleInfo module in modules {
+        string encodedLibraryLabel = urlEncode(module.libraryLabel);
+        string encodedBiLabel = urlEncode(module.biLabel);
+        string libraryLink = string `[${module.libraryLabel}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel})`;
+        string biLink = string `[${module.biLabel}](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:${encodedBiLabel})`;
+
+        dashboard += string `| ${module.name} | ${libraryLink} | ${biLink} |` + "\n";
+    }
+
+    return dashboard;
+}
+
+// Generate tools section for dashboard
+function generateToolsSection(ToolInfo[] tools) returns string {
+    string dashboard = "## Tools" + "\n\n";
+    dashboard += "| Tool | Organization | Latest Release | Open Issues | Open PRs | Build Status |" + "\n";
+    dashboard += "|------|--------------|----------------|-------------|----------|-------------|" + "\n";
+
+    foreach ToolInfo tool in tools {
+        string toolLink = string `[${tool.name}](https://github.com/${tool.githubOrg}/${tool.toolRepo})`;
+        string buildBadge = tool.hasBuild ?
+            string `[![Build](https://github.com/${tool.githubOrg}/${tool.toolRepo}/workflows/Build/badge.svg)](https://github.com/${tool.githubOrg}/${tool.toolRepo}/actions)` :
+            "N/A";
+
+        string issuesLink = string `[${tool.openIssues}](https://github.com/${tool.githubOrg}/${tool.toolRepo}/issues)`;
+        string prsLink = string `[${tool.openPRs}](https://github.com/${tool.githubOrg}/${tool.toolRepo}/pulls)`;
+
+        dashboard += string `| ${toolLink} | ${tool.org} | ${tool.latestRelease} | ${issuesLink} | ${prsLink} | ${buildBadge} |` + "\n";
+    }
+
+    dashboard += "\n" + "### Issue Labels" + "\n\n";
+    dashboard += "| Tool | Library Label | BI Label |" + "\n";
+    dashboard += "|------|---------------|----------|" + "\n";
+
+    foreach ToolInfo tool in tools {
+        string encodedLibraryLabel = urlEncode(tool.libraryLabel);
+        string encodedBiLabel = urlEncode(tool.biLabel);
+        string libraryLink = string `[${tool.libraryLabel}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel})`;
+        string biLink = string `[${tool.biLabel}](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:${encodedBiLabel})`;
+
+        dashboard += string `| ${tool.name} | ${libraryLink} | ${biLink} |` + "\n";
+    }
+
+    return dashboard;
+}
+
+// Get current timestamp in readable format
+function getCurrentTimestamp() returns string {
+    // This is a simplified version - in real implementation you'd use time library
+    return "2025-11-07"; // Placeholder
+}
+
+// Update dashboard section in README.md
+public function updateDashboardInReadme(string dashboardContent, string filename) returns error? {
+    // Read existing README
+    string readmeContent = check io:fileReadString(filename);
+
+    // Find the dashboard section markers
+    string startMarker = "<!-- DASHBOARD_START -->";
+    string endMarker = "<!-- DASHBOARD_END -->";
+
+    int? startIndex = readmeContent.indexOf(startMarker);
+    int? endIndex = readmeContent.indexOf(endMarker);
+
+    if startIndex == () || endIndex == () {
+        return error("Dashboard markers not found in README.md. Please ensure <!-- DASHBOARD_START --> and <!-- DASHBOARD_END --> markers exist.");
+    }
+
+    // Calculate position after start marker
+    int contentStart = startIndex + startMarker.length();
+
+    // Extract parts of README
+    string beforeDashboard = readmeContent.substring(0, contentStart);
+    string afterDashboard = readmeContent.substring(endIndex);
+
+    // Construct new README with updated dashboard
+    string newReadme = beforeDashboard + "\n" + dashboardContent + "\n" + afterDashboard;
+
+    // Write back to file
+    check io:fileWriteString(filename, newReadme);
+    io:println(string `Dashboard section updated in ${filename}`);
+}

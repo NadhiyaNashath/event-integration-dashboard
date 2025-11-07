@@ -1,0 +1,66 @@
+{
+    "products": [
+        {
+            "name": "websubhub",
+            "org": "wso2",
+            "product-repository": "product-integrator-websubhub"
+        },
+        {
+            "name": "si",
+            "org": "wso2",
+            "product-repository": "product-streaming-integrator"
+        }
+    ],
+    "modules": [
+        {
+            "name": "mqtt",
+            "org": "ballerina"
+        },
+        {
+            "name": "websocket",
+            "org": "ballerina"
+        },
+        {
+            "name": "websub",
+            "org": "ballerina"
+        },
+        {
+            "name": "websubhub",
+            "org": "ballerina"
+        },
+        {
+            "name": "asb",
+            "org": "ballerinax",
+            "module-repository": "module-ballerinax-azure-service-bus"
+        },
+        {
+            "name": "ibm.ibmmq",
+            "org": "ballerinax"
+        },
+        {
+            "name": "java.jms",
+            "org": "ballerinax"
+        },
+        {
+            "name": "kafka",
+            "org": "ballerinax"
+        },
+        {
+            "name": "rabbitmq",
+            "org": "ballerinax"
+        },
+        {
+            "name": "solace",
+            "org": "ballerinax"
+        }
+    ],
+    "tools": [
+        {
+            "name": "tool.asyncapi",
+            "org": "ballerina",
+            "library-label": "module/asyncapi-tools",
+            "bi-label": "eventintegration/asyncapi",
+            "tool-repository": "asyncapi-tools"
+        }
+    ]
+}
