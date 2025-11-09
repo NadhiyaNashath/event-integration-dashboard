@@ -38,32 +38,41 @@ public function getLatestRelease(GitHubClient github, string org, string repo) r
     return response.tag_name;
 }
 
-// Fetch open pull requests count
-public function getOpenPRsCount(GitHubClient github, string org, string repo) returns int|error {
-    string path = string `/repos/${org}/${repo}/pulls?state=open&per_page=1`;
-    http:Response response = check github->get(path);
+// Fetch open issues count (excluding pull requests)
+public function getOpenIssuesCount(GitHubClient github, string org, string repo) returns int|error {
+    string path = string `/repos/${org}/${repo}/issues?state=open`;
+    json[]|error issues = github->get(path);
 
-    string|error? linkHeader = response.getHeader("Link");
-    if linkHeader is error || linkHeader is () {
+    if issues is error {
+        log:printWarn(string `Failed to fetch issues for ${org}/${repo}: ${issues.message()}`);
         return 0;
     }
 
-    // Parse Link header to get the last page number
-    // Link: <url>; rel="last"
+    // Filter out pull requests (issues API returns both issues and PRs)
     int count = 0;
-    if linkHeader.includes("rel=\"last\"") {
-        // Extract page number from link header
-        string[] parts = re `page=`.split(linkHeader);
-        if parts.length() > 1 {
-            string pageStr = re `>`.split(parts[1])[0];
-            int|error pageNum = int:fromString(pageStr);
-            if pageNum is int {
-                count = pageNum;
+    foreach json issue in issues {
+        if issue is map<json> {
+            // Check if this is a pull request by looking for 'pull_request' field
+            if !issue.hasKey("pull_request") {
+                count += 1;
             }
         }
     }
 
     return count;
+}
+
+// Fetch open pull requests count
+public function getOpenPRsCount(GitHubClient github, string org, string repo) returns int|error {
+    string path = string `/repos/${org}/${repo}/pulls?state=open`;
+    json[]|error pulls = github->get(path);
+
+    if pulls is error {
+        log:printWarn(string `Failed to fetch pull requests for ${org}/${repo}: ${pulls.message()}`);
+        return 0;
+    }
+
+    return pulls.length();
 }
 
 // Check if repository has GitHub Actions workflow
@@ -95,22 +104,24 @@ public function fetchProductInfo(GitHubClient github, Product product) returns P
     // Fetch product repository information
     GitHubRepo repoInfo = check getRepoInfo(github, githubOrg, productRepo);
     string latestRelease = check getLatestRelease(github, githubOrg, productRepo);
+    int openIssues = check getOpenIssuesCount(github, githubOrg, productRepo);
     int openPRs = check getOpenPRsCount(github, githubOrg, productRepo);
     boolean hasBuild = hasGitHubActions(github, githubOrg, productRepo);
 
     // Fetch documentation repository information
-    GitHubRepo|error docsRepoInfo = getRepoInfo(github, githubOrg, docsRepo);
     int openDocsIssues = 0;
     int openDocsPRs = 0;
 
-    if docsRepoInfo is GitHubRepo {
-        openDocsIssues = docsRepoInfo.open_issues_count;
-        int|error docsPRs = getOpenPRsCount(github, githubOrg, docsRepo);
-        if docsPRs is int {
-            openDocsPRs = docsPRs;
-        }
+    int|error docsIssues = getOpenIssuesCount(github, githubOrg, docsRepo);
+    if docsIssues is int {
+        openDocsIssues = docsIssues;
     } else {
         log:printWarn(string `Documentation repository not found for ${product.name}: ${githubOrg}/${docsRepo}`);
+    }
+
+    int|error docsPRs = getOpenPRsCount(github, githubOrg, docsRepo);
+    if docsPRs is int {
+        openDocsPRs = docsPRs;
     }
 
     return {
@@ -121,7 +132,7 @@ public function fetchProductInfo(GitHubClient github, Product product) returns P
         docsRepo: docsRepo,
         helmRepo: helmRepo,
         defaultBranch: repoInfo.default_branch,
-        openIssues: repoInfo.open_issues_count,
+        openIssues: openIssues,
         openPRs: openPRs,
         openDocsIssues: openDocsIssues,
         openDocsPRs: openDocsPRs,
@@ -139,6 +150,7 @@ public function fetchModuleInfo(GitHubClient github, Module module) returns Modu
 
     GitHubRepo repoInfo = check getRepoInfo(github, githubOrg, moduleRepo);
     string latestRelease = check getLatestRelease(github, githubOrg, moduleRepo);
+    int openIssues = check getOpenIssuesCount(github, githubOrg, moduleRepo);
     int openPRs = check getOpenPRsCount(github, githubOrg, moduleRepo);
     boolean hasBuild = hasGitHubActions(github, githubOrg, moduleRepo);
 
@@ -150,7 +162,7 @@ public function fetchModuleInfo(GitHubClient github, Module module) returns Modu
         libraryLabel: libraryLabel,
         biLabel: biLabel,
         defaultBranch: repoInfo.default_branch,
-        openIssues: repoInfo.open_issues_count,
+        openIssues: openIssues,
         openPRs: openPRs,
         latestRelease: latestRelease,
         hasBuild: hasBuild,
@@ -165,6 +177,7 @@ public function fetchToolInfo(GitHubClient github, Tool tool) returns ToolInfo|e
 
     GitHubRepo repoInfo = check getRepoInfo(github, githubOrg, toolRepo);
     string latestRelease = check getLatestRelease(github, githubOrg, toolRepo);
+    int openIssues = check getOpenIssuesCount(github, githubOrg, toolRepo);
     int openPRs = check getOpenPRsCount(github, githubOrg, toolRepo);
     boolean hasBuild = hasGitHubActions(github, githubOrg, toolRepo);
 
@@ -176,7 +189,7 @@ public function fetchToolInfo(GitHubClient github, Tool tool) returns ToolInfo|e
         libraryLabel: tool.'library\-label,
         biLabel: tool.'bi\-label,
         defaultBranch: repoInfo.default_branch,
-        openIssues: repoInfo.open_issues_count,
+        openIssues: openIssues,
         openPRs: openPRs,
         latestRelease: latestRelease,
         hasBuild: hasBuild
