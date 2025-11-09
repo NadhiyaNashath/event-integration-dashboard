@@ -18,13 +18,6 @@ The Event Integration team maintains various products, Ballerina modules, and to
 | wso2 | [websubhub](https://github.com/wso2/product-integrator-websubhub) | N/A | [2](https://github.com/wso2/product-integrator-websubhub/issues) | [0](https://github.com/wso2/product-integrator-websubhub/pulls) | [0](https://github.com/wso2/docs-websubhub/issues) | [0](https://github.com/wso2/docs-websubhub/pulls) | [![Build](https://github.com/wso2/product-integrator-websubhub/workflows/Build/badge.svg)](https://github.com/wso2/product-integrator-websubhub/actions) |
 | wso2 | [si](https://github.com/wso2/product-streaming-integrator) | v4.3.1 | [24](https://github.com/wso2/product-streaming-integrator/issues) | [0](https://github.com/wso2/product-streaming-integrator/pulls) | [1](https://github.com/wso2/docs-si/issues) | [0](https://github.com/wso2/docs-si/pulls) | N/A |
 
-### Related Repositories
-
-| Product | Documentation | Helm Charts |
-|---------|---------------|-------------|
-| websubhub | [docs-websubhub](https://github.com/wso2/docs-websubhub) | [helm-websubhub](https://github.com/wso2/helm-websubhub) |
-| si | [docs-si](https://github.com/wso2/docs-si) | [helm-si](https://github.com/wso2/helm-si) |
-
 ---
 
 ## Modules

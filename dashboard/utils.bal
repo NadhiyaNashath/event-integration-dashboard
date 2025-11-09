@@ -50,17 +50,6 @@ function generateProductsSection(ProductInfo[] products) returns string {
         dashboard += string `| ${product.org} | ${productLink} | ${product.latestRelease} | ${productIssuesLink} | ${productPRsLink} | ${docsIssuesLink} | ${docsPRsLink} | ${buildBadge} |` + "\n";
     }
 
-    dashboard += "\n" + "### Related Repositories" + "\n\n";
-    dashboard += "| Product | Documentation | Helm Charts |" + "\n";
-    dashboard += "|---------|---------------|-------------|" + "\n";
-
-    foreach ProductInfo product in products {
-        string docsLink = string `[${product.docsRepo}](https://github.com/${product.githubOrg}/${product.docsRepo})`;
-        string helmLink = string `[${product.helmRepo}](https://github.com/${product.githubOrg}/${product.helmRepo})`;
-
-        dashboard += string `| ${product.name} | ${docsLink} | ${helmLink} |` + "\n";
-    }
-
     return dashboard;
 }
 
