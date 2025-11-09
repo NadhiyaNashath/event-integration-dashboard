@@ -33,8 +33,8 @@ public function generateDashboard(ProductInfo[] products, ModuleInfo[] modules, 
 // Generate products section for dashboard
 function generateProductsSection(ProductInfo[] products) returns string {
     string dashboard = "## Products" + "\n\n";
-    dashboard += "| Product | Organization | Latest Release | Open Issues | Open PRs | Build Status |" + "\n";
-    dashboard += "|---------|--------------|----------------|-------------|----------|-------------|" + "\n";
+    dashboard += "| Organization | Product Name | Latest Release | Open Product Issues | Open Product PRs | Open Documentation Issues | Open Documentation PRs | Build Status |" + "\n";
+    dashboard += "|--------------|--------------|----------------|---------------------|------------------|---------------------------|------------------------|--------------|" + "\n";
 
     foreach ProductInfo product in products {
         string productLink = string `[${product.name}](https://github.com/${product.githubOrg}/${product.productRepo})`;
@@ -42,10 +42,12 @@ function generateProductsSection(ProductInfo[] products) returns string {
             string `[![Build](https://github.com/${product.githubOrg}/${product.productRepo}/workflows/Build/badge.svg)](https://github.com/${product.githubOrg}/${product.productRepo}/actions)` :
             "N/A";
 
-        string issuesLink = string `[${product.openIssues}](https://github.com/${product.githubOrg}/${product.productRepo}/issues)`;
-        string prsLink = string `[${product.openPRs}](https://github.com/${product.githubOrg}/${product.productRepo}/pulls)`;
+        string productIssuesLink = string `[${product.openIssues}](https://github.com/${product.githubOrg}/${product.productRepo}/issues)`;
+        string productPRsLink = string `[${product.openPRs}](https://github.com/${product.githubOrg}/${product.productRepo}/pulls)`;
+        string docsIssuesLink = string `[${product.openDocsIssues}](https://github.com/${product.githubOrg}/${product.docsRepo}/issues)`;
+        string docsPRsLink = string `[${product.openDocsPRs}](https://github.com/${product.githubOrg}/${product.docsRepo}/pulls)`;
 
-        dashboard += string `| ${productLink} | ${product.org} | ${product.latestRelease} | ${issuesLink} | ${prsLink} | ${buildBadge} |` + "\n";
+        dashboard += string `| ${product.org} | ${productLink} | ${product.latestRelease} | ${productIssuesLink} | ${productPRsLink} | ${docsIssuesLink} | ${docsPRsLink} | ${buildBadge} |` + "\n";
     }
 
     dashboard += "\n" + "### Related Repositories" + "\n\n";

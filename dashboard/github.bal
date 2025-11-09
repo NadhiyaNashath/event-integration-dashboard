@@ -92,10 +92,26 @@ public function fetchProductInfo(GitHubClient github, Product product) returns P
     string docsRepo = product.'documentation\-repository ?: string `docs-${product.name}`;
     string helmRepo = product.'helm\-repository ?: string `helm-${product.name}`;
 
+    // Fetch product repository information
     GitHubRepo repoInfo = check getRepoInfo(github, githubOrg, productRepo);
     string latestRelease = check getLatestRelease(github, githubOrg, productRepo);
     int openPRs = check getOpenPRsCount(github, githubOrg, productRepo);
     boolean hasBuild = hasGitHubActions(github, githubOrg, productRepo);
+
+    // Fetch documentation repository information
+    GitHubRepo|error docsRepoInfo = getRepoInfo(github, githubOrg, docsRepo);
+    int openDocsIssues = 0;
+    int openDocsPRs = 0;
+
+    if docsRepoInfo is GitHubRepo {
+        openDocsIssues = docsRepoInfo.open_issues_count;
+        int|error docsPRs = getOpenPRsCount(github, githubOrg, docsRepo);
+        if docsPRs is int {
+            openDocsPRs = docsPRs;
+        }
+    } else {
+        log:printWarn(string `Documentation repository not found for ${product.name}: ${githubOrg}/${docsRepo}`);
+    }
 
     return {
         name: product.name,
@@ -107,6 +123,8 @@ public function fetchProductInfo(GitHubClient github, Product product) returns P
         defaultBranch: repoInfo.default_branch,
         openIssues: repoInfo.open_issues_count,
         openPRs: openPRs,
+        openDocsIssues: openDocsIssues,
+        openDocsPRs: openDocsPRs,
         latestRelease: latestRelease,
         hasBuild: hasBuild
     };

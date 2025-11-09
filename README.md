@@ -13,10 +13,10 @@ The Event Integration team maintains various products, Ballerina modules, and to
 
 ## Products
 
-| Product | Organization | Latest Release | Open Issues | Open PRs | Build Status |
-|---------|--------------|----------------|-------------|----------|-------------|
-| [websubhub](https://github.com/wso2/product-integrator-websubhub) | wso2 | N/A | [2](https://github.com/wso2/product-integrator-websubhub/issues) | [0](https://github.com/wso2/product-integrator-websubhub/pulls) | [![Build](https://github.com/wso2/product-integrator-websubhub/workflows/Build/badge.svg)](https://github.com/wso2/product-integrator-websubhub/actions) |
-| [si](https://github.com/wso2/product-streaming-integrator) | wso2 | v4.3.1 | [24](https://github.com/wso2/product-streaming-integrator/issues) | [0](https://github.com/wso2/product-streaming-integrator/pulls) | N/A |
+| Organization | Product Name | Latest Release | Open Product Issues | Open Product PRs | Open Documentation Issues | Open Documentation PRs | Build Status |
+|--------------|--------------|----------------|---------------------|------------------|---------------------------|------------------------|--------------|
+| wso2 | [websubhub](https://github.com/wso2/product-integrator-websubhub) | N/A | [2](https://github.com/wso2/product-integrator-websubhub/issues) | [0](https://github.com/wso2/product-integrator-websubhub/pulls) | [0](https://github.com/wso2/docs-websubhub/issues) | [0](https://github.com/wso2/docs-websubhub/pulls) | [![Build](https://github.com/wso2/product-integrator-websubhub/workflows/Build/badge.svg)](https://github.com/wso2/product-integrator-websubhub/actions) |
+| wso2 | [si](https://github.com/wso2/product-streaming-integrator) | v4.3.1 | [24](https://github.com/wso2/product-streaming-integrator/issues) | [0](https://github.com/wso2/product-streaming-integrator/pulls) | [1](https://github.com/wso2/docs-si/issues) | [0](https://github.com/wso2/docs-si/pulls) | N/A |
 
 ### Related Repositories
 

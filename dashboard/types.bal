@@ -47,6 +47,8 @@ public type ProductInfo record {
     string defaultBranch;
     int openIssues;
     int openPRs;
+    int openDocsIssues;
+    int openDocsPRs;
     string latestRelease;
     boolean hasBuild;
 };
