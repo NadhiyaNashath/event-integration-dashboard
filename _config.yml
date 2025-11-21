@@ -4,7 +4,7 @@ description: "Centralized tracking of Event Integration team's assets."
 
 # The theme is what gives you the 'nicer site' without writing CSS
 # You can choose any of the supported GitHub Pages themes.
-remote_theme: LeNPaul/Millennial
+theme: jekyll-theme-cayman
 
 # Build Settings for GitHub Pages
 repository: NadhiyaNashath/event-integration-dashboard
