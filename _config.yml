@@ -1,0 +1,19 @@
+# Site Settings
+title: "Event Integration Dashboard"
+description: "Centralized tracking of Event Integration team's assets."
+
+# The theme is what gives you the 'nicer site' without writing CSS
+# You can choose any of the supported GitHub Pages themes.
+theme: jekyll-theme-cayman
+
+# Build Settings for GitHub Pages
+repository: NadhiyaNashath/event-integration-dashboard
+url: "https://NadhiyaNashath.github.io"
+baseurl: "/event-integration-dashboard"
+
+# Exclude files/folders from the final site build
+exclude:
+  - packages.json
+  - developer-guide.md
+  - dashboard/
+  # Add other folders/files you don't want visible
